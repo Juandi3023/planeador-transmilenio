@@ -21,6 +21,20 @@ Aplicación de escritorio y motor algorítmico implementado desde cero en Python
 * **Alternativa descartada:** Filtrado lineal sobre un arreglo ($O(n)$), que inspecciona toda la red aunque el rango solicitado tenga pocas estaciones.
 * **Complejidad:** **$O(\log n + m)$**, donde **$n$** es el número total de estaciones y **$m$** es la cantidad de estaciones abiertas dentro del intervalo `[desde, hasta]`.
 
+### R4 · Próximo bus (red.proximo_bus(estacion, ruta, hora))
+* *Estructura y algoritmo:* Arreglo ordenado de tuplas (minutos, "HH:MM") indexado por (ruta, estación) en TablaHash, consultado mediante *Búsqueda Binaria* (busqueda_binaria_siguiente) para encontrar el primer bus con salida $\ge \text{hora}$.
+* *Alternativa descartada:* Búsqueda lineal sobre los horarios ($O(n)$) o búsqueda por interpolación (en horas pico hay alta frecuencia de buses y en madrugada baja frecuencia; al no ser una distribución uniforme, la interpolación puede degradarse a $O(n)$).
+* *Complejidad:* *$O(\log n)$, donde *$n$** es la cantidad de horarios diarios de esa ruta en esa estación.
+
+### R5 · Planear un viaje (red.viaje(origen, destino))
+* *Estructura y algoritmo:* Recorrido de rutas almacenadas en ListaDobleRuta apoyado en una TablaHash (alcanzables_origen) que guarda el mínimo de paradas desde origen hacia cada estación intermedia abierta, evaluando viajes directos (0 transbordos) y con 1 transbordo en una sola pasada.
+* *Alternativa descartada:* Algoritmo de Dijkstra general con cola de prioridad ($O((V + E) \log V)$), innecesario dado que el problema acota el itinerario a máximo 1 transbordo y minimiza el conteo de paradas sin pesos variables.
+* *Complejidad:* *$O(n \cdot L)$, donde *$n$* es el número de rutas activas y *$L$** es el promedio de paradas por ruta.
+
+### R6 · Ranking de estaciones (red.ranking(k))
+* *Estructura y algoritmo:* *Caché con invalidación perezosa (*lazy invalidation)* ordenada con **Merge Sort* propio. Cuando se edita una ruta (R7) o se cierra/reabre una estación (R8), se marca una bandera _ranking_sucio = True; solo en la siguiente consulta se recalcula y ordena, mientras que las consultas repetidas leen directamente la caché.
+* *Alternativa descartada:* Recalcular y ordenar toda la red en cada llamada a ranking(k), lo cual repetiría trabajo $O(n \log n)$ innecesariamente cuando la red no ha sufrido cambios.
+* *Complejidad:* *$O(k)$* en consultas con caché vigente y *$O(M + n \log n)$* tras una modificación de la red, donde *$n$* es el número de estaciones y *$M$* es el total de paradas en las rutas.
 
 
 
