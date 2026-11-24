@@ -36,7 +36,26 @@ Aplicación de escritorio y motor algorítmico implementado desde cero en Python
 * *Alternativa descartada:* Recalcular y ordenar toda la red en cada llamada a ranking(k), lo cual repetiría trabajo $O(n \log n)$ innecesariamente cuando la red no ha sufrido cambios.
 * *Complejidad:* *$O(k)$* en consultas con caché vigente y *$O(M + n \log n)$* tras una modificación de la red, donde *$n$* es el número de estaciones y *$M$* es el total de paradas en las rutas.
 
+### R7 · Editar rutas y ver recorrido (agregar_parada, quitar_parada, recorrido)
+* *Estructura y algoritmo:* ListaDobleRuta (lista doblemente enlazada con punteros prev y next) combinada con una TablaHash interna (indice_nodos) que apunta directamente al NodoDoble de cada estación dentro de la ruta.
+* *Alternativa descartada:* list de Python estándar, donde insertar o eliminar paradas intermedias obliga a desplazar elementos en memoria ($O(n)$), y lista simplemente enlazada, donde recorrer en sentido inverso (al_reves=True) requeriría invertir la lista o usar recursión.
+* *Complejidad:* *$O(1)$* promedio para agregar_parada y quitar_parada, y *$O(n)$* para recorrido, donde *$n$* es el número de paradas de la ruta.
 
+### R8 · Cerrar y reabrir estaciones (cerrar, reabrir)
+* *Estructura y algoritmo:* Actualización directa de bandera booleana tanto en TablaHash ($O(1)$) como en el NodoAVL correspondiente dentro del ArbolAVL ($O(\log n)$), conservando intacta la estación y sus horarios históricos para futuras reaperturas.
+* *Alternativa descartada:* Eliminar físicamente el nodo del ArbolAVL al cerrar y volver a insertarlo al reabrir, lo que complicaría restaurar su información asociada.
+* *Complejidad:* *$O(\log n)$* para cerrar y reabrir, donde *$n$* es el número total de estaciones de la red.
+
+### R9 · Deshacer y rehacer (deshacer, rehacer)
+* *Estructura y algoritmo:* Dos *Pilas (LIFO)* independientes (pila_deshacer y pila_rehacer) que almacenan tuplas de comando con la información mínima para aplicar la acción inversa. Cualquier cambio nuevo limpia pila_rehacer.
+* *Alternativa descartada:* Guardar copias completas (snapshots) de toda la red antes de cada edición, lo que consumiría $O(n + M)$ de memoria y tiempo por operación.
+* *Complejidad:* *$O(1)$* al deshacer/rehacer ediciones de ruta (R7) y *$O(\log n)$* al deshacer/rehacer cierres o reaperturas (R8), donde *$n$* es el número total de estaciones.
+
+### R10 · Fila de abordaje en hora pico (simular_fila)
+* *Estructura y algoritmo:* Cola *FIFO enlazada* con punteros explícitos _frente y _final para encolar llegadas de pasajeros y desencolar abordajes según la frecuencia y capacidad de cada bus.
+* *Alternativa descartada:* Implementar la fila con list.pop(0) de Python, ya que cada desencolado desplaza todos los elementos restantes en memoria y degrada la simulación a $O(n^2)$ con cientos de miles de pasajeros.
+* *Complejidad:* *$O(n)$* cuando las llegadas vienen ordenadas cronológicamente ($O(n \log n)$ si requieren ordenamiento previo con Merge Sort), donde *$n$* es el número total de pasajeros simulados.
+*
 
 ---
 
